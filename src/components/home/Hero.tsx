@@ -53,7 +53,7 @@ export function Hero() {
           {}
           <img
             src="/art/hero.webp"
-            alt="A glass Cuilby coin with a gold horseshoe rising over stacks of gold coins"
+            alt="The Cuilby water-drop mascot rising over stacks of gold coins"
             width={1600}
             height={900}
             fetchPriority="high"

@@ -65,7 +65,7 @@ export function Portfolio() {
         {}
         <img
           src="/art/ticket.webp"
-          alt="A gold raffle ticket stamped with the Cuilby horseshoe"
+          alt="A gold raffle ticket stamped with the Cuilby mascot"
           width={248}
           height={248}
           className="size-[124px] object-contain"

@@ -493,7 +493,7 @@ export const DOCS: Doc[] = [
     lede: "Artwork for articles, listings and partner pages.",
     metaTitle: "Brand Kit and Logo Downloads",
     metaDescription:
-      "Download the Cuilby brand kit: the horseshoe coin logo, a logo on a dark plate, an X banner and a social card, plus the colour values to use with them.",
+      "Download the Cuilby brand kit: the water-drop mascot logo, a logo on a dark plate, an X banner and a social card, plus the colour values to use with them.",
     keyword: "brand kit",
     secondary: ["logo download", "press kit", "brand colours"],
     body: (
@@ -502,7 +502,7 @@ export const DOCS: Doc[] = [
         <h2>Logo and banner files</h2>
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
-            ["Logo mark, 512 px", "/brand/cuilby-mark.webp", "The Cuilby horseshoe coin logo on a transparent background"],
+            ["Logo mark, 512 px", "/brand/cuilby-mark.webp", "The Cuilby water-drop mascot logo on a transparent background"],
             ["Logo on dark plate, 1024 px", "/brand/cuilby-badge.webp", "The Cuilby logo centred on a dark square plate"],
             ["X banner, 1500 × 500", "/brand/cuilby-banner.webp", "Wide Cuilby banner for an X profile header"],
             ["Social card, 1200 × 630", "/brand/cuilby-card.webp", "Cuilby social sharing card with the logo and slogan"],
@@ -520,8 +520,8 @@ export const DOCS: Doc[] = [
         <h2>Brand colours</h2>
         <p>
           The brand colour is mint <code>#97FCE4</code>, pot amounts use gold <code>#F3BD52</code> and the page ground is{" "}
-          <code>#0A0F0D</code>. The logo keeps its cobalt coin <code>#3442E0</code> and yellow horseshoe <code>#FFC83A</code>. Please do not
-          recolour or stretch it.
+          <code>#0A0F0D</code>. The mascot logo keeps its own watercolour blues; use it on the dark ground or on its dark plate. Please
+          do not recolour or stretch it.
         </p>
       </>
     ),
