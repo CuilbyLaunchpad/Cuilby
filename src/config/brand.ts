@@ -25,7 +25,7 @@ export const BRAND = {
   x: "https://x.com/cuilbyxyz",
   xHandle: "@cuilbyxyz",
   // Public source repository. Kept off the site until the owner publishes it.
-  github: "https://github.com/CuilbyXYZ/Cuilby",
+  github: "https://github.com/CuilbyLaunchpad/Cuilby",
   ca: CA,
 } as const;
 
