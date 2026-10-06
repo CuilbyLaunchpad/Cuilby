@@ -22,10 +22,10 @@ export const BRAND = {
   tagline: "Launch a coin. Every buy feeds the pot. Someone always wins.",
   description:
     "Cuilby is a jackpot launchpad on Robinhood Chain: every coin carries a pot that a share of each buy fee fills, and every round hands that pot to one of its players.",
-  x: "https://x.com/cuilby",
-  xHandle: "@cuilby",
+  x: "https://x.com/cuilbyxyz",
+  xHandle: "@cuilbyxyz",
   // Public source repository. Kept off the site until the owner publishes it.
-  github: "https://github.com/",
+  github: "https://github.com/CuilbyXYZ/Cuilby",
   ca: CA,
 } as const;
 
