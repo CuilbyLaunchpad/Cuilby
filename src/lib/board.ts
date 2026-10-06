@@ -170,3 +170,14 @@ export async function readCoin(key: string): Promise<CoinDetail | null> {
 }
 
 export const microToEth = (micro: number) => micro / MICRO;
+
+/** Name, ticker and kind for page metadata. Reads only; never settles a round. */
+export async function coinIdentity(key: string): Promise<{ name: string; symbol: string; kind: "live" | "practice"; logo: string | null } | null> {
+  if (key.startsWith("p-")) {
+    const store = getStore();
+    const coin = store ? await readPracticeCoin(store, key).catch(() => null) : null;
+    return coin ? { name: coin.name, symbol: coin.symbol, kind: "practice", logo: null } : null;
+  }
+  const coin = await findCoin(key).catch(() => null);
+  return coin ? { name: coin.name, symbol: coin.symbol, kind: "live", logo: coin.hasLogo ? `/api/logo/${coin.key}` : null } : null;
+}

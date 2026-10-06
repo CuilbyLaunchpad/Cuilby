@@ -13,8 +13,8 @@
   "dependencies": {
     "@noble/curves": "^2.4.0",
     "@noble/hashes": "^2.4.0",
+    "@phosphor-icons/react": "^2.1.10",
     "@walletconnect/ethereum-provider": "^2.25.0",
-    "lucide-react": "^1.47.0",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",

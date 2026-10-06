@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DocView } from "@/components/docs/DocView";
-import { DOCS, docBySlug } from "@/components/docs/content";
+import { DOCS, docBySlug, docHref } from "@/components/docs/content";
+import { pageMeta } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -11,7 +12,8 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const doc = docBySlug((await params).slug);
-  return { title: doc ? doc.title : "Docs" };
+  if (!doc || !doc.slug) return {};
+  return pageMeta({ title: doc.metaTitle, description: doc.metaDescription, path: docHref(doc.slug), type: "article" });
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {

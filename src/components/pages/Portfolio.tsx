@@ -61,23 +61,24 @@ export function Portfolio() {
 
   if (!address) {
     return (
-      <main className="mx-auto max-w-[1180px] px-4 pt-14 pb-10 sm:px-6">
-        <div className="ticket mx-auto flex max-w-2xl flex-col overflow-hidden sm:flex-row">
-          <div className="min-w-0 flex-1 p-7">
-            <h1 className="h-display text-[44px]">Every ticket you hold, in one place.</h1>
-            <p className="mt-3 text-[15.5px] leading-relaxed text-ink-2">
-              Link a wallet and this page lists its coins on {CHAIN.name}, the practice rounds it entered and took, and the fees it
-              collected from coins it started.
-            </p>
-            <button type="button" onClick={open} className="btn btn-ink mt-6 h-12 px-6 text-base">
-              Connect wallet
-            </button>
-          </div>
-          <div className="perf perf-y hidden w-[150px] shrink-0 items-center justify-center bg-amber sm:flex">
-            <span className="h-display -rotate-90 text-[30px] whitespace-nowrap">admit one</span>
-          </div>
-        </div>
-      </main>
+      <div className="surface mx-auto flex max-w-lg flex-col items-center px-6 py-14 text-center">
+        {}
+        <img
+          src="/art/ticket.webp"
+          alt="A gold raffle ticket stamped with the Cuilby horseshoe"
+          width={248}
+          height={248}
+          className="size-[124px] object-contain"
+        />
+        <h1 className="display mt-3 text-[28px] font-extrabold">Your crypto portfolio and pot wins</h1>
+        <p className="mt-1.5 text-[14px] text-fg-2">
+          Link a wallet to list its coins on {CHAIN.name}, the practice rounds it played and won, and the fees it earned from coins it
+          launched.
+        </p>
+        <button type="button" onClick={open} className="btn-surge mt-5 h-11 rounded-full px-6 text-[15px] font-bold">
+          Connect wallet
+        </button>
+      </div>
     );
   }
 
@@ -87,73 +88,109 @@ export function Portfolio() {
     const c = byKey.get(key);
     return c?.priceUsd ? c.priceUsd * amount : null;
   };
+  const head = "text-[15px] font-semibold";
 
   return (
-    <main className="mx-auto max-w-[1180px] px-4 pt-10 pb-10 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <>
+      <section className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="h-display text-[48px] sm:text-[60px]">Portfolio</h1>
-          <a href={explorerAddress(address)} target="_blank" rel="noreferrer" className="font-mono text-[13px] break-all text-ink-2 hover:underline">
+          <h1 className="display text-[36px] leading-none font-extrabold md:text-[48px]">Your portfolio</h1>
+          <a
+            href={explorerAddress(address)}
+            target="_blank"
+            rel="noreferrer"
+            className="num mt-2 block text-[13px] break-all text-fg-3 hover:text-fg"
+          >
             {address}
           </a>
         </div>
-        <p className={`chip ${onRobinhoodChain ? "chip-up" : "chip-down"}`}>
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium ${onRobinhoodChain ? "bg-up/10 text-up" : "bg-down/10 text-down"}`}
+        >
+          <span className={`size-1.5 rounded-full ${onRobinhoodChain ? "bg-up" : "bg-down"}`} />
           {onRobinhoodChain ? `${CHAIN.name} · ${CHAIN.id}` : `Wallet on chain ${chainId ?? "?"}`}
-        </p>
-      </div>
+        </span>
+      </section>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="panel p-5">
-          <p className="label">Real ETH on {CHAIN.name}</p>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="surface p-5">
+          <p className="text-[12px] text-fg-3">Real ETH on {CHAIN.name}</p>
           <p className="num mt-1 text-[26px]">{balance ?? "–"}</p>
-          <p className="text-[12.5px] text-ink-3">read from the chain</p>
+          <p className="text-[12px] text-fg-3">read from the chain</p>
         </div>
-        <div className="ticket p-5">
-          <p className="label">Practice balance</p>
-          <p className="num mt-1 text-[26px]" data-testid="practice-balance">
+        <div className="surface relative overflow-hidden p-5">
+          <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(360px_160px_at_100%_0%,rgb(243_189_82/0.12),transparent_70%)]" />
+          <p className="relative text-[12px] text-fg-3">Practice balance</p>
+          <p className="num relative mt-1 text-[26px] text-gold" data-testid="practice-balance">
             {configured === false ? "off" : account ? `${peth(account.balance)} pETH` : "not opened"}
           </p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="relative mt-2 flex flex-wrap gap-2">
             {configured !== false && !account ? (
-              <button type="button" onClick={() => act("join")} disabled={busy !== null} className="btn btn-brand h-9 px-4 text-[13px]" data-testid="join">
+              <button
+                type="button"
+                onClick={() => act("join")}
+                disabled={busy !== null}
+                className="btn-surge h-9 rounded-full px-4 text-[13px] font-bold"
+                data-testid="join"
+              >
                 {busy ?? "Open with 1 pETH"}
               </button>
             ) : null}
             {canTopUp ? (
-              <button type="button" onClick={() => act("topup")} disabled={busy !== null} className="btn btn-accent h-9 px-4 text-[13px]">
+              <button
+                type="button"
+                onClick={() => act("topup")}
+                disabled={busy !== null}
+                className="btn-ghost h-9 rounded-full px-4 text-[13px] font-semibold"
+              >
                 Top up 0.5 pETH
               </button>
             ) : null}
           </div>
         </div>
-        <div className="panel p-5">
-          <p className="label">Creator earnings (practice)</p>
-          <p className="num mt-1 text-[26px] text-brand">{peth(earnings)} pETH</p>
+        <div className="surface p-5">
+          <p className="text-[12px] text-fg-3">Creator earnings (practice)</p>
+          <p className="num mt-1 text-[26px] text-surge">{peth(earnings)} pETH</p>
           {earnings > 0 ? (
-            <button type="button" onClick={() => act("claim")} disabled={busy !== null} className="btn btn-ghost mt-2 h-9 px-4 text-[13px]">
+            <button
+              type="button"
+              onClick={() => act("claim")}
+              disabled={busy !== null}
+              className="btn-ghost mt-2 h-9 rounded-full px-4 text-[13px] font-semibold"
+            >
               Move to balance
             </button>
           ) : (
-            <p className="text-[12.5px] text-ink-3">20% of fees on coins you launched</p>
+            <p className="text-[12px] text-fg-3">20% of the fees on coins you launched</p>
           )}
         </div>
       </div>
-      {error ? <p role="alert" className="mt-4 rounded-lg border border-down bg-down-soft px-3 py-2 text-[13px] text-down">{error}</p> : null}
-      {notice ? <p className="mt-4 rounded-lg border border-up bg-up-soft px-3 py-2 text-[13px] text-up-deep">{notice}</p> : null}
+      {error ? (
+        <p role="alert" className="mt-4 rounded-[12px] bg-down/10 px-3 py-2 text-[13px] text-down">
+          {error}
+        </p>
+      ) : null}
+      {notice ? <p className="mt-4 rounded-[12px] bg-up/10 px-3 py-2 text-[13px] text-up">{notice}</p> : null}
 
-      <section className="mt-12">
-        <h2 className="h-display text-[30px]">Practice positions</h2>
+      <section className="surface mt-4 p-2 md:p-3">
+        <h2 className={`${head} px-3 pt-2 pb-1`}>Practice positions</h2>
         {positions.length === 0 ? (
-          <p className="panel mt-4 p-5 text-ink-2">
-            No practice coins yet. <Link href="/" className="text-brand underline">Pick a coin on the board</Link> and play a buy.
+          <p className="px-3 py-5 text-[13px] text-fg-3">
+            No practice coins yet.{" "}
+            <Link href="/" className="font-semibold text-surge hover:underline">
+              Pick a coin on the board
+            </Link>{" "}
+            and play a buy.
           </p>
         ) : (
-          <div className="panel scroll-x mt-4">
-            <table className="w-full min-w-[600px] text-left text-[14px]">
-              <thead>
-                <tr className="border-b border-line">
-                  {["Coin", "Free", "Held for a pot", "Value", "Cost"].map((h) => (
-                    <th key={h} className="label px-4 py-2.5 font-normal">{h}</th>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px] text-[13px]">
+              <thead className="text-left text-[12px] text-fg-3">
+                <tr>
+                  {["Coin", "Free", "Held for a pot", "Value", "Cost"].map((h, i) => (
+                    <th key={h} className={`px-3 py-2 font-normal ${i ? "text-right" : ""}`}>
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -162,17 +199,17 @@ export function Portfolio() {
                   const c = byKey.get(key);
                   const v = value(key, p.tokens + p.locked);
                   return (
-                    <tr key={key} className="border-b border-line last:border-0">
-                      <td className="px-4 py-2.5">
-                        <Link href={`/t/${key}`} className="flex items-center gap-2 font-semibold hover:underline">
+                    <tr key={key} className="border-t border-line">
+                      <td className="px-3 py-2">
+                        <Link href={`/t/${key}`} className="flex items-center gap-2 font-semibold hover:text-surge">
                           <CoinLogo src={c?.logo ?? null} symbol={c?.symbol ?? "?"} size={28} />
                           {c?.symbol ?? short(key)}
                         </Link>
                       </td>
-                      <td className="num px-4 py-2.5">{tokens(p.tokens)}</td>
-                      <td className="num px-4 py-2.5">{p.locked > 0 ? tokens(p.locked) : "–"}</td>
-                      <td className="num px-4 py-2.5">{v === null ? "–" : usd(v)}</td>
-                      <td className="num px-4 py-2.5">{peth(p.cost)} pETH</td>
+                      <td className="num px-3 py-2 text-right">{tokens(p.tokens)}</td>
+                      <td className="num px-3 py-2 text-right">{p.locked > 0 ? tokens(p.locked) : "–"}</td>
+                      <td className="num px-3 py-2 text-right">{v === null ? "–" : usd(v)}</td>
+                      <td className="num px-3 py-2 text-right text-fg-2">{peth(p.cost)} pETH</td>
                     </tr>
                   );
                 })}
@@ -182,46 +219,46 @@ export function Portfolio() {
         )}
       </section>
 
-      <section className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="min-w-0">
-          <h2 className="h-display text-[30px]">Wins</h2>
+      <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="surface min-w-0 p-4 md:p-5">
+          <h2 className={head}>Pot wins</h2>
           {account?.wins.length ? (
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-3 flex flex-col gap-2">
               {account.wins.map((w, i) => (
-                <li key={`${w.coin}-${w.round}-${i}`} className="panel flex items-center justify-between gap-3 p-4">
-                  <Link href={`/t/${w.coin}`} className="min-w-0 truncate font-semibold hover:underline">
+                <li key={`${w.coin}-${w.round}-${i}`} className="tile flex items-center justify-between gap-3 px-3 py-2.5">
+                  <Link href={`/t/${w.coin}`} className="min-w-0 truncate font-semibold hover:text-surge">
                     {w.symbol} · round {w.round}
                   </Link>
-                  <span className="num shrink-0 text-pot">
-                    +{peth(w.prize)} pETH <span className="text-[12px] text-ink-3">{now ? `${ago(w.at, now)} ago` : ""}</span>
+                  <span className="num shrink-0 text-gold">
+                    +{peth(w.prize)} pETH <span className="text-[12px] text-fg-3">{now ? `${ago(w.at, now)} ago` : ""}</span>
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="panel mt-4 p-5 text-ink-2">No wins yet. Prizes land in the practice balance the moment a round settles.</p>
+            <p className="mt-2 text-[13px] text-fg-3">No wins yet. A prize lands in the practice balance the moment its round settles.</p>
           )}
         </div>
-        <div className="min-w-0">
-          <h2 className="h-display text-[30px]">On chain</h2>
-          <p className="mt-1 text-[13px] text-ink-3">Real balances of the live coins on the board, read from {CHAIN.name}.</p>
+        <div className="surface min-w-0 p-4 md:p-5">
+          <h2 className={head}>Coins held on chain</h2>
+          <p className="mt-1 text-[12px] text-fg-3">Real balances of the live coins on the board, read from {CHAIN.name}.</p>
           {holdings.failed ? (
-            <p className="panel mt-4 p-5 text-ink-2">The chain could not be read right now.</p>
+            <p className="mt-3 text-[13px] text-fg-3">The chain could not be read right now.</p>
           ) : !holdings.rows ? (
-            <p className="panel mt-4 p-5 text-ink-2">Reading balances…</p>
+            <p className="mt-3 text-[13px] text-fg-3">Reading balances…</p>
           ) : holdings.rows.length === 0 ? (
-            <p className="panel mt-4 p-5 text-ink-2">This wallet holds none of the coins on the board.</p>
+            <p className="mt-3 text-[13px] text-fg-3">This wallet holds none of the coins on the board.</p>
           ) : (
-            <ul className="mt-4 space-y-2" data-testid="holdings">
+            <ul className="mt-3 flex flex-col gap-2" data-testid="holdings">
               {holdings.rows.map((r) => (
-                <li key={r.coin.key} className="panel flex items-center justify-between gap-3 p-3">
-                  <Link href={`/t/${r.coin.key}`} className="flex min-w-0 items-center gap-2 font-semibold hover:underline">
+                <li key={r.coin.key} className="tile flex items-center justify-between gap-3 px-3 py-2">
+                  <Link href={`/t/${r.coin.key}`} className="flex min-w-0 items-center gap-2 font-semibold hover:text-surge">
                     <CoinLogo src={r.coin.logo} symbol={r.coin.symbol} size={30} />
                     <span className="truncate">{r.coin.symbol}</span>
                   </Link>
-                  <span className="num shrink-0 text-right text-[13.5px]">
+                  <span className="num shrink-0 text-right text-[13px]">
                     {tokens(r.amount)}
-                    <span className="block text-[12px] text-ink-3">{r.coin.priceUsd ? usd(r.coin.priceUsd * r.amount) : "–"}</span>
+                    <span className="block text-[12px] text-fg-3">{r.coin.priceUsd ? usd(r.coin.priceUsd * r.amount) : "–"}</span>
                   </span>
                 </li>
               ))}
@@ -231,14 +268,14 @@ export function Portfolio() {
       </section>
 
       {account?.launched.length ? (
-        <section className="mt-12">
-          <h2 className="h-display text-[30px]">Coins you launched</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
+        <section className="surface mt-4 p-4 md:p-5">
+          <h2 className={head}>Coins you launched</h2>
+          <ul className="mt-3 flex flex-wrap gap-2">
             {account.launched.map((id) => {
               const c = byKey.get(id);
               return (
                 <li key={id}>
-                  <Link href={`/t/${id}`} className="btn btn-ghost h-10 px-4 text-[14px]">
+                  <Link href={`/t/${id}`} className="btn-ghost inline-flex h-9 items-center rounded-full px-4 text-[14px]">
                     {c?.symbol ?? id}
                   </Link>
                 </li>
@@ -247,6 +284,6 @@ export function Portfolio() {
           </ul>
         </section>
       ) : null}
-    </main>
+    </>
   );
 }

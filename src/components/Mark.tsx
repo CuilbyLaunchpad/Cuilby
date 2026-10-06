@@ -31,21 +31,13 @@ export function Mark({ size = 32, className = "" }: { size?: number; className?:
         <circle cx="42.4" cy="37" r="1.3" />
         <circle cx="43.4" cy="28" r="1.3" />
       </g>
-      <path d="M32 17 L34 24 L41 26 L34 28 L32 35 L30 28 L23 26 L30 24 Z" fill="#ffffff" stroke="#12152e" strokeWidth="1.5" strokeLinejoin="round" />
+      <path
+        d="M32 17 L34 24 L41 26 L34 28 L32 35 L30 28 L23 26 L30 24 Z"
+        fill="#ffffff"
+        stroke="#12152e"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
     </svg>
-  );
-}
-
-export function MarkBadge({ size = 24 }: { size?: number }) {
-  return <Mark size={size} className="shrink-0" />;
-}
-
-/** Wordmark: the mark plus the name set in the display face. */
-export function Wordmark({ className = "" }: { className?: string }) {
-  return (
-    <span className={`flex items-center gap-2 ${className}`}>
-      <Mark size={34} />
-      <span className="h-display text-[26px] leading-none">cuilby</span>
-    </span>
   );
 }

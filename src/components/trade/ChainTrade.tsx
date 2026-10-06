@@ -1,22 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDownUp } from "lucide-react";
+import { ArrowUpRight, ArrowsDownUp, GearSix } from "@phosphor-icons/react";
+import { EthGlyph } from "@/components/ui";
 import { CHAIN, PONS } from "@/config/brand";
 import { useWalletModal } from "@/components/wallet/WalletButton";
 import { useWallet } from "@/components/wallet/WalletProvider";
 import { rpc } from "@/lib/rpc";
-import {
-  formatUnits,
-  loadMarket,
-  parseUnits,
-  plan,
-  quote,
-  tokenBalance,
-  waitForReceipt,
-  withSlippage,
-  type Market,
-} from "@/lib/pons";
+import { formatUnits, loadMarket, parseUnits, plan, quote, tokenBalance, waitForReceipt, withSlippage, type Market } from "@/lib/pons";
 
 /*
  * A real swap card for any Pons V2 launch priced in ETH: quotes are read from
@@ -87,8 +78,19 @@ export function venueLabel(token: string | null, market: Market | null, failed: 
   return market.reason ?? "Unavailable";
 }
 
-export function ChainTrade({ token, symbol, title = "Trade on chain", note }: { token: string | null; symbol: string; title?: string; note?: string }) {
+export function ChainTrade({
+  token,
+  symbol,
+  title = "Trade on chain",
+  note,
+}: {
+  token: string | null;
+  symbol: string;
+  title?: string;
+  note?: string;
+}) {
   const [reverse, setReverse] = useState(false);
+  const [showSlippage, setShowSlippage] = useState(false);
   const [amount, setAmount] = useState("");
   const { address, chainId, onRobinhoodChain, switchNetwork, switching, sendTransaction, refreshBalance } = useWallet();
   const { open } = useWalletModal();
@@ -165,34 +167,71 @@ export function ChainTrade({ token, symbol, title = "Trade on chain", note }: { 
   const show = (v: bigint | null) => (v === null ? null : formatUnits(v, 18, 4));
 
   return (
-    <div className="panel p-4 sm:p-5" data-testid="chain-trade">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="h-display text-[24px]">{title}</h2>
-        <span className="flex items-center gap-1 font-mono text-[11px]">
-          <span className="text-ink-3">Slippage</span>
-          {SLIPPAGES.map((bps) => (
-            <button
-              key={bps}
-              type="button"
-              onClick={() => setSlippage(bps)}
-              className={`cursor-pointer rounded-full border px-1.5 py-0.5 ${slippage === bps ? "border-ink bg-ink text-chalk" : "border-transparent text-ink-2 hover:border-line-2"}`}
-            >
-              {bps / 100}%
-            </button>
-          ))}
+    <section className="surface p-4" data-testid="chain-trade" aria-label={title}>
+      <div className="flex items-center justify-between gap-2 px-1">
+        <h2 className="text-[15px] font-semibold">{title}</h2>
+        <span className="text-[12px] text-fg-3">
+          Venue:{" "}
+          <span className="text-fg-2" data-testid="swap-venue">
+            {venueLabel(token, market, failed)}
+          </span>
         </span>
       </div>
-      <p className="mt-1 text-[12.5px] text-ink-3">
-        Venue: <span className="font-semibold text-ink-2" data-testid="swap-venue">{venueLabel(token, market, failed)}</span>
-      </p>
+      <div className="mt-3 flex items-center gap-2">
+        <div
+          className="grid flex-1 grid-cols-2 rounded-full bg-card-2 p-1 shadow-[inset_0_0_0_1px_var(--color-line)]"
+          role="tablist"
+          aria-label="Trade side"
+        >
+          {([false, true] as const).map((rev) => (
+            <button
+              key={String(rev)}
+              type="button"
+              role="tab"
+              aria-selected={reverse === rev}
+              onClick={() => setReverse(rev)}
+              className={`relative h-9 rounded-full text-[14px] font-semibold transition-colors ${reverse === rev ? "text-ink" : "text-fg-2 hover:text-fg"}`}
+            >
+              {reverse === rev ? <span className="absolute inset-0 rounded-full bg-surge" /> : null}
+              <span className="relative">{rev ? "Sell" : "Buy"}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowSlippage((v) => !v)}
+          aria-expanded={showSlippage}
+          aria-label="Slippage settings"
+          className="btn-ghost grid size-9 shrink-0 place-items-center rounded-full"
+        >
+          <GearSix size={16} />
+        </button>
+      </div>
+      {showSlippage ? (
+        <div className="tile mt-2 flex items-center justify-between gap-2 px-3 py-2 text-[12px] text-fg-3">
+          <span>Max slippage</span>
+          <span className="flex gap-1">
+            {SLIPPAGES.map((bps) => (
+              <button
+                key={bps}
+                type="button"
+                onClick={() => setSlippage(bps)}
+                className={`num h-7 rounded-full px-2.5 text-[12px] ${slippage === bps ? "bg-card-3 text-fg" : "text-fg-3 hover:text-fg"}`}
+              >
+                {bps / 100}%
+              </button>
+            ))}
+          </span>
+        </div>
+      ) : null}
 
-      <div className="mt-3 rounded-xl border border-line-2 bg-paper px-4 pt-2.5 pb-3">
-        <div className="flex justify-between gap-2 text-xs font-semibold text-ink-2">
-          <span>You pay</span>
+      <div className="tile mt-3 px-4 pt-3 pb-3">
+        <div className="flex items-center justify-between gap-2 text-[12px] text-fg-3">
+          <label htmlFor={`pay-${title}`}>You pay</label>
           <span className="flex min-w-0 gap-2">
-            <span className="truncate">Balance: {show(sendBalanceRaw) ?? "–"}</span>
+            <span className="num truncate">Balance {show(sendBalanceRaw) ?? "–"}</span>
             {token && sendBalanceRaw !== null ? (
-              <button type="button" onClick={fillMax} className="cursor-pointer font-bold text-brand underline">
+              <button type="button" onClick={fillMax} className="font-semibold text-surge hover:underline">
                 Max
               </button>
             ) : null}
@@ -200,7 +239,9 @@ export function ChainTrade({ token, symbol, title = "Trade on chain", note }: { 
         </div>
         <div className="mt-1 flex items-center gap-2">
           <input
+            id={`pay-${title}`}
             inputMode="decimal"
+            autoComplete="off"
             placeholder="0"
             value={amount}
             onChange={(e) => {
@@ -208,69 +249,93 @@ export function ChainTrade({ token, symbol, title = "Trade on chain", note }: { 
               const dot = v.indexOf(".");
               setAmount(dot < 0 ? v : v.slice(0, dot + 1) + v.slice(dot + 1).replace(/\./g, ""));
             }}
-            className="min-w-0 flex-1 bg-transparent font-mono text-[24px] outline-none placeholder:text-ink-3"
+            className="num min-w-0 flex-1 bg-transparent text-[32px] leading-tight font-medium text-fg outline-none placeholder:text-fg-4"
             aria-label={`Amount of ${sendToken} to send`}
           />
-          <span className="max-w-[45%] shrink-0 truncate rounded-full border border-line-2 bg-card px-3 py-1 text-sm font-semibold">{sendToken}</span>
+          <span className="inline-flex max-w-[45%] shrink-0 items-center gap-1.5 truncate rounded-full bg-card-3 py-1.5 pr-3 pl-1.5 text-[13px] font-semibold">
+            {sendToken === "ETH" ? <EthGlyph size={20} /> : null}
+            {sendToken}
+          </span>
         </div>
       </div>
 
-      <div className="relative z-10 -my-3 flex justify-center">
+      <div className="relative z-10 -my-2 flex justify-center">
         <button
           type="button"
           onClick={() => setReverse((v) => !v)}
           aria-label="Flip direction"
-          className="flex size-9 cursor-pointer items-center justify-center rounded-full border-[1.5px] border-ink bg-card transition-transform hover:rotate-180"
+          className="btn-ghost grid size-8 place-items-center rounded-full"
         >
-          <ArrowDownUp className="size-4" strokeWidth={2.5} />
+          <ArrowsDownUp size={14} />
         </button>
       </div>
 
-      <div className="rounded-xl border border-line-2 bg-paper-2 px-4 pt-2.5 pb-3">
-        <div className="flex justify-between gap-2 text-xs font-semibold text-ink-2">
-          <span>You get</span>
-          <span className="truncate">Balance: {show(buying ? balances.token : balances.eth) ?? "–"}</span>
+      <div className="tile px-4 pt-3 pb-3">
+        <div className="flex justify-between gap-2 text-[12px] text-fg-3">
+          <span>You receive</span>
+          <span className="num truncate">Balance {show(buying ? balances.token : balances.eth) ?? "–"}</span>
         </div>
         <div className="mt-1 flex items-center gap-2">
-          <span className={`min-w-0 flex-1 truncate font-mono text-[24px] ${out ? "text-ink" : "text-ink-3"}`} data-testid="swap-out">
+          <span
+            className={`num min-w-0 flex-1 truncate text-[26px] leading-tight font-medium ${out ? "text-fg" : "text-fg-4"}`}
+            data-testid="swap-out"
+          >
             {out !== null ? formatUnits(out, 18, buying ? 2 : 6) : "0"}
           </span>
-          <span className="max-w-[45%] shrink-0 truncate rounded-full border border-line-2 bg-card px-3 py-1 text-sm font-semibold">{receiveToken}</span>
+          <span className="inline-flex max-w-[45%] shrink-0 items-center gap-1.5 truncate rounded-full bg-card-3 py-1.5 pr-3 pl-1.5 text-[13px] font-semibold">
+            {receiveToken === "ETH" ? <EthGlyph size={20} /> : null}
+            {receiveToken}
+          </span>
         </div>
       </div>
-      <p className="mt-1.5 px-1 text-xs text-ink-3">
+      <p className="num mt-1.5 min-h-4 px-1 text-[12px] text-fg-3">
         {!token
           ? "Quotes open at launch"
           : quoteError
             ? quoteError
             : out !== null
               ? `At least ${formatUnits(withSlippage(out, slippage), 18, buying ? 2 : 6)} after ${slippage / 100}% slippage`
-              : "Fees included in the quote"}
+              : "Fees are included in the quote"}
       </p>
 
       <div className="mt-3">
         {!address ? (
-          <button type="button" onClick={open} className="btn btn-ink h-12 w-full text-base" data-testid="swap-connect">
+          <button
+            type="button"
+            onClick={open}
+            className="btn-surge h-12 w-full rounded-full text-[15px] font-bold"
+            data-testid="swap-connect"
+          >
             Connect wallet
           </button>
         ) : wrong ? (
-          <button type="button" onClick={switchNetwork} disabled={switching} className="btn btn-accent h-12 w-full text-base">
+          <button
+            type="button"
+            onClick={switchNetwork}
+            disabled={switching}
+            className="btn-surge h-12 w-full rounded-full text-[15px] font-bold"
+          >
             {switching ? "Confirm in wallet…" : `Switch to ${CHAIN.name}`}
           </button>
         ) : !token ? (
-          <button type="button" disabled className="btn btn-accent h-12 w-full text-base">
+          <button type="button" disabled className="btn-ghost h-12 w-full rounded-full text-[15px] font-bold">
             Swaps open at launch
           </button>
         ) : market && market.venue === "unavailable" ? (
-          <a href={PONS.page(token)} target="_blank" rel="noreferrer" className="btn btn-accent h-12 w-full text-base">
-            Trade on Pons ↗
+          <a
+            href={PONS.page(token)}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-surge inline-flex h-12 w-full items-center justify-center gap-1.5 rounded-full text-[15px] font-bold"
+          >
+            Trade it on Pons <ArrowUpRight size={14} weight="bold" />
           </a>
         ) : (
           <button
             type="button"
             onClick={trade}
             disabled={!tradable || !amountIn || short || out === null || out === 0n || stage !== null}
-            className="btn btn-accent h-12 w-full text-base"
+            className="btn-surge h-12 w-full rounded-full text-[15px] font-bold"
             data-testid="swap-submit"
           >
             {stage ??
@@ -289,16 +354,22 @@ export function ChainTrade({ token, symbol, title = "Trade on chain", note }: { 
         )}
       </div>
       {tradeError ? (
-        <p role="alert" className="mt-3 rounded-lg border border-down bg-down-soft px-3 py-2 text-xs leading-relaxed break-words text-down">
+        <p role="alert" className="mt-3 rounded-[12px] bg-down/10 px-3 py-2 text-[12.5px] leading-relaxed break-words text-down">
           {tradeError}
         </p>
       ) : null}
       {lastTx ? (
-        <a href={`${CHAIN.explorer}/tx/${lastTx}`} target="_blank" rel="noreferrer" className="mt-3 block text-center font-mono text-xs text-up underline" data-testid="swap-done">
-          Swap confirmed · view transaction ↗
+        <a
+          href={`${CHAIN.explorer}/tx/${lastTx}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 flex items-center justify-center gap-1 text-[12.5px] text-up hover:underline"
+          data-testid="swap-done"
+        >
+          Swap confirmed, view the transaction <ArrowUpRight size={12} />
         </a>
       ) : null}
-      {note ? <p className="mt-3 text-[12px] leading-relaxed text-ink-3">{note}</p> : null}
-    </div>
+      {note ? <p className="mt-3 text-center text-[11.5px] leading-relaxed text-fg-3">{note}</p> : null}
+    </section>
   );
 }

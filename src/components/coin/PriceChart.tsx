@@ -39,7 +39,11 @@ export function PriceChart({ points, ethUsd, supply }: { points: ChartPoint[]; e
   }, [points, ethUsd, supply]);
 
   if (!geo) {
-    return <div className="flex h-[220px] items-center justify-center text-[14px] text-ink-3">Not enough trades in this range to draw.</div>;
+    return (
+      <div className="grid h-[300px] place-items-center text-[13px] text-fg-3 md:h-[380px]">
+        Not enough trades in this range to draw a chart.
+      </div>
+    );
   }
   const fmt = (v: number) =>
     v >= 1e6 ? `$${(v / 1e6).toFixed(2)}M` : v >= 1e3 ? `$${(v / 1e3).toFixed(1)}K` : `$${v.toFixed(v < 10 ? 2 : 0)}`;
@@ -71,24 +75,39 @@ export function PriceChart({ points, ethUsd, supply }: { points: ChartPoint[]; e
         {geo.ticks.map((t, i) => (
           <g key={i}>
             <line x1={PAD.l} x2={W - PAD.r} y1={t.y} y2={t.y} stroke="var(--color-line)" strokeDasharray="3 4" />
-            <text x={W - PAD.r + 6} y={t.y + 4} fontSize="11" fill="var(--color-ink-3)" fontFamily="var(--font-mono)">
+            <text x={W - PAD.r + 6} y={t.y + 4} fontSize="11" fill="var(--color-fg-3)" fontFamily="var(--font-mono)">
               {fmt(t.v)}
             </text>
           </g>
         ))}
-        <path d={geo.area} fill="var(--color-brand)" fillOpacity="0.08" />
-        <path d={geo.line} fill="none" stroke="var(--color-brand)" strokeWidth="2" strokeLinejoin="round" />
+        <path d={geo.area} fill="var(--color-surge)" fillOpacity="0.08" />
+        <path d={geo.line} fill="none" stroke="var(--color-surge)" strokeWidth="2" strokeLinejoin="round" />
         {geo.bars.map((b, i) => (
-          <rect key={i} x={b.x} y={H - PAD.b - b.h} width={b.w} height={b.h} fill="var(--color-ink)" fillOpacity={hover === i ? 0.6 : 0.18} />
+          <rect
+            key={i}
+            x={b.x}
+            y={H - PAD.b - b.h}
+            width={b.w}
+            height={b.h}
+            fill="var(--color-up)"
+            fillOpacity={hover === i ? 0.6 : 0.25}
+          />
         ))}
         {h ? (
           <g>
-            <line x1={geo.sx(h.t)} x2={geo.sx(h.t)} y1={PAD.t} y2={H - PAD.b} stroke="var(--color-ink)" strokeOpacity="0.4" />
-            <circle cx={geo.sx(h.t)} cy={geo.sy(toUsd(h.priceEth))} r="4" fill="var(--color-amber)" stroke="var(--color-ink)" strokeWidth="1.5" />
+            <line x1={geo.sx(h.t)} x2={geo.sx(h.t)} y1={PAD.t} y2={H - PAD.b} stroke="var(--color-fg)" strokeOpacity="0.35" />
+            <circle
+              cx={geo.sx(h.t)}
+              cy={geo.sy(toUsd(h.priceEth))}
+              r="4"
+              fill="var(--color-gold)"
+              stroke="var(--color-ink)"
+              strokeWidth="1.5"
+            />
           </g>
         ) : null}
       </svg>
-      <div className="pointer-events-none absolute top-1 left-2 rounded-lg bg-card/90 px-2 py-1 font-mono text-[11.5px] text-ink-2">
+      <div className="num pointer-events-none absolute top-1 left-2 rounded-[10px] bg-card-3/90 px-2 py-1 text-[11.5px] text-fg-2">
         {h
           ? `${new Date(h.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${fmt(toUsd(h.priceEth))} · ${h.trades} trades`
           : `Market cap ${fmt(toUsd(points[points.length - 1].priceEth))}`}

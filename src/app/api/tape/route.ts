@@ -14,6 +14,8 @@ export type TapeItem = {
   eth: number;
   at: number;
   tx: string | null;
+  /** Logo route for live coins that have one. */
+  logo?: string | null;
 };
 
 /**
@@ -21,7 +23,10 @@ export type TapeItem = {
  * to practice plays, each tagged with where it came from.
  */
 export async function GET() {
-  const coins = (await activeCoins()).filter((c) => c.latestBuyAt).sort((a, b) => (b.latestBuyAt ?? 0) - (a.latestBuyAt ?? 0)).slice(0, 4);
+  const coins = (await activeCoins())
+    .filter((c) => c.latestBuyAt)
+    .sort((a, b) => (b.latestBuyAt ?? 0) - (a.latestBuyAt ?? 0))
+    .slice(0, 4);
   const lists = await Promise.allSettled(coins.map((c) => trades(c.key)));
   const chain: TapeItem[] = lists.flatMap((r, i) =>
     r.status === "fulfilled"
@@ -34,6 +39,7 @@ export async function GET() {
           eth: t.eth,
           at: t.at,
           tx: t.tx || null,
+          logo: coins[i].hasLogo ? `/api/logo/${coins[i].key}` : null,
         }))
       : [],
   );
