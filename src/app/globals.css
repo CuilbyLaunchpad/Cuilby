@@ -1,0 +1,340 @@
+@import "tailwindcss";
+
+@theme {
+  /* Raffle-ticket paper: cool fog, navy ink, cobalt brand, a lucky yellow stub
+     and tomato for money in the pot. */
+  --color-paper: #eef0f6;
+  --color-paper-2: #e2e5ef;
+  --color-card: #ffffff;
+  --color-ink: #12152e;
+  --color-ink-2: #434967;
+  --color-ink-3: #6c7190;
+  --color-line: rgba(18, 21, 46, 0.12);
+  --color-line-2: rgba(18, 21, 46, 0.24);
+
+  --color-brand: #3442e0;
+  --color-brand-deep: #2431b8;
+  --color-brand-soft: #e0e3fc;
+  --color-pot: #e9502a;
+  --color-pot-deep: #c23d1b;
+  --color-pot-soft: #fde5dc;
+
+  --color-up: #0c8a57;
+  --color-up-deep: #086a43;
+  --color-up-soft: #d9f1e6;
+  --color-down: #d8432b;
+  --color-down-deep: #b23520;
+  --color-down-soft: #fbe2dc;
+  --color-amber: #ffc83a;
+  --color-amber-deep: #d39e0c;
+  --color-amber-soft: #fff2c9;
+
+  --color-board: #12152e;
+  --color-board-2: #1c2142;
+  --color-board-3: #2a3058;
+  --color-chalk: #eef0f6;
+
+  --font-sans: var(--font-figtree), "Figtree", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-fraunces), "Fraunces", Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-dmmono), "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-amber);
+  color: var(--color-ink);
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1.5px solid transparent;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .btn:not(:disabled):active {
+    transform: translate(1px, 1px);
+  }
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-chalk);
+  }
+  .btn-ink:not(:disabled):hover {
+    background: var(--color-board-3);
+  }
+  .btn-accent {
+    background: var(--color-amber);
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+    box-shadow: 2px 2px 0 var(--color-ink);
+  }
+  .btn-accent:not(:disabled):hover {
+    background: #ffd463;
+  }
+  .btn-brand {
+    background: var(--color-brand);
+    color: #fff;
+    border-color: var(--color-ink);
+    box-shadow: 2px 2px 0 var(--color-ink);
+  }
+  .btn-brand:not(:disabled):hover {
+    background: var(--color-brand-deep);
+  }
+  .btn-ghost {
+    background: var(--color-card);
+    color: var(--color-ink);
+    border-color: var(--color-line-2);
+  }
+  .btn-ghost:not(:disabled):hover {
+    border-color: var(--color-ink);
+  }
+  .btn-up {
+    background: var(--color-up);
+    color: #fff;
+  }
+  .btn-up:not(:disabled):hover {
+    background: var(--color-up-deep);
+  }
+  .btn-down {
+    background: var(--color-down);
+    color: #fff;
+  }
+  .btn-down:not(:disabled):hover {
+    background: var(--color-down-deep);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-3);
+  }
+  .h-display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+    font-variation-settings: "SOFT" 100, "WONK" 1;
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .panel {
+    background: var(--color-card);
+    border: 1px solid var(--color-line-2);
+    border-radius: 14px;
+  }
+  /* The raffle ticket: navy outline and a hard offset shadow. */
+  .ticket {
+    position: relative;
+    background: var(--color-card);
+    border: 1.5px solid var(--color-ink);
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 var(--color-ink);
+  }
+  /* Perforated tear line with two punched notches, between ticket and stub. */
+  .perf {
+    position: relative;
+    border-style: dashed;
+    border-color: var(--color-line-2);
+  }
+  .perf-y {
+    border-left-width: 2px;
+  }
+  .perf-x {
+    border-top-width: 2px;
+  }
+  .perf-y::before,
+  .perf-y::after,
+  .perf-x::before,
+  .perf-x::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--color-paper);
+    border: 1.5px solid var(--color-ink);
+  }
+  .perf-y::before {
+    top: -11px;
+    left: -10px;
+    clip-path: inset(50% 0 0 0);
+  }
+  .perf-y::after {
+    bottom: -11px;
+    left: -10px;
+    clip-path: inset(0 0 50% 0);
+  }
+  .perf-x::before {
+    left: -11px;
+    top: -10px;
+    clip-path: inset(0 0 0 50%);
+  }
+  .perf-x::after {
+    right: -11px;
+    top: -10px;
+    clip-path: inset(0 50% 0 0);
+  }
+  .board {
+    background: var(--color-board);
+    color: var(--color-chalk);
+    border-radius: 16px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .chip-up {
+    background: var(--color-up-soft);
+    color: var(--color-up-deep);
+  }
+  .chip-down {
+    background: var(--color-down-soft);
+    color: var(--color-down-deep);
+  }
+  .chip-flat {
+    background: var(--color-paper-2);
+    color: var(--color-ink-2);
+  }
+  .chip-amber {
+    background: var(--color-amber-soft);
+    color: #6d4c00;
+  }
+  .chip-brand {
+    background: var(--color-brand-soft);
+    color: var(--color-brand-deep);
+  }
+  .chip-pot {
+    background: var(--color-pot-soft);
+    color: var(--color-pot-deep);
+  }
+  .field {
+    width: 100%;
+    border-radius: 10px;
+    border: 1.5px solid var(--color-line-2);
+    background: var(--color-card);
+    padding: 0.6rem 0.8rem;
+    color: var(--color-ink);
+    outline: none;
+  }
+  .field:focus {
+    border-color: var(--color-brand);
+  }
+  .scroll-x {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .scroll-x::-webkit-scrollbar {
+    display: none;
+  }
+  .prose-doc p {
+    margin-top: 0.9rem;
+    line-height: 1.7;
+    color: var(--color-ink-2);
+  }
+  .prose-doc h2 {
+    margin-top: 2.2rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+  .prose-doc ul,
+  .prose-doc ol {
+    margin-top: 0.9rem;
+    padding-left: 1.2rem;
+    color: var(--color-ink-2);
+    line-height: 1.7;
+  }
+  .prose-doc ul {
+    list-style: disc;
+  }
+  .prose-doc ol {
+    list-style: decimal;
+  }
+  .prose-doc li + li {
+    margin-top: 0.4rem;
+  }
+  .prose-doc strong {
+    color: var(--color-ink);
+  }
+  .prose-doc a {
+    color: var(--color-brand-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-doc code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--color-paper-2);
+    border-radius: 6px;
+    padding: 1px 5px;
+    word-break: break-all;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
