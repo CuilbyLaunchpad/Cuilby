@@ -297,26 +297,36 @@ export function chart(address: string, range: ChartRange): Promise<ChartPoint[]>
   });
 }
 
-/** Fetches a coin's logo through the launchpad's IPFS proxy, or its https URL. */
+/**
+ * Fetches a coin's logo through the launchpad's IPFS proxy. The logo field is
+ * written by whoever launched the coin, so the server never follows it to an
+ * arbitrary host (a name can resolve to an internal address, a redirect can
+ * point anywhere): an IPFS content id goes through the launchpad's proxy,
+ * and plain https is only fetched from a short list of image hosts. The host
+ * is never taken from the field and redirects are refused. Anything else
+ * gets the monogram.
+ */
+const LOGO_HOSTS = [/^pbs\.twimg\.com$/, /^[a-z0-9]{20}\.supabase\.co$/];
+
+function logoUrl(logo: string): string | null {
+  const cid = /^ipfs:\/\/([A-Za-z0-9]{40,100})(?:[/?#]|$)/.exec(logo)?.[1] ?? /\/ipfs\/([A-Za-z0-9]{40,100})(?:[/?#]|$)/.exec(logo)?.[1];
+  if (cid) return `${BASE}/api/ipfs/content/${cid}?variant=card`;
+  try {
+    const u = new URL(logo);
+    if (u.protocol !== "https:" || u.port || u.username || u.password) return null;
+    return LOGO_HOSTS.some((h) => h.test(u.hostname)) ? `https://${u.hostname}${u.pathname}${u.search}` : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchLogo(key: string): Promise<{ body: ArrayBuffer; type: string } | null> {
   const logo = logoOf(key);
   if (!logo) return null;
-  let url: string | null = null;
-  const cid = /^ipfs:\/\/([A-Za-z0-9]+)/.exec(logo)?.[1] ?? /\/ipfs\/([A-Za-z0-9]{40,})/.exec(logo)?.[1];
-  if (cid) url = `${BASE}/api/ipfs/content/${cid}?variant=card`;
-  else {
-    try {
-      const u = new URL(logo);
-      // Public https hosts only; no IP literals or local names.
-      if (u.protocol === "https:" && /[a-z]/i.test(u.hostname.split(".").pop() ?? "") && !/localhost|\.local$|\.internal$/i.test(u.hostname)) {
-        url = u.toString();
-      }
-    } catch {
-      url = null;
-    }
-  }
+  const url = logoUrl(logo);
   if (!url) return null;
-  const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(6000), redirect: "follow" });
+  const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(6000), redirect: "error" });
+  if (Number(res.headers.get("content-length") ?? 0) > 1_500_000) return null;
   const type = res.headers.get("content-type") ?? "";
   if (!res.ok || !/^image\/(png|jpe?g|webp|gif|avif)/.test(type)) return null;
   const body = await res.arrayBuffer();
